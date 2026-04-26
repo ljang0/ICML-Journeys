@@ -136,9 +136,7 @@ We conduct an analysis of model performance, test-time scaling with more steps, 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/odyssey_figure1_v13.pdf}
-    \vspace{-0.7in}
     \caption{\small Odysseys is a long-horizon web agent benchmark with 200 tasks based on real user browsing data. Example task (with simplified task description), trajectory and rubric-based evaluation visualized above.}
-    \vspace{-0.1in}
     \label{fig:Fig1}
 \end{figure}
 
@@ -254,9 +252,7 @@ We only benchmarked models that have general computer-use abilities, and do not 
 \bottomrule
 \end{tabular}%
 }
-\vspace{-0.12in}
 \caption{\small Model performance on \odysseys.}
-\vspace{-0.05in}
 \label{tab:model-scores}
 \end{table*}
 
@@ -277,18 +273,14 @@ Rubrics (Perfect)      & \textbf{0.849} & 0.901  & \textbf{0.970}  & 0.934 & \te
 \bottomrule
 \end{tabular}
 }
-\vspace{-0.1in}
 \caption{\small Automated LLM-based metrics vs.\ human agreement. Rubrics scores (Cohen's $\kappa$, precision, recall, F1, and accuracy against human labels) show substantial agreement, while the trajectory-level Online-M2W (holistic binary judgment) agreement is worse.}
-\vspace{-0.1in}
 \label{tab:judge-correlation}
 \end{table*}
 
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/examples/gpt-14-pastebase64.pdf}
-    \vspace{-0.2in}
     \caption{\small After researching 10 surgeon profiles, GPT-5.4 encoded the entire data table as a base64 string inside the Python action, decoded it at runtime with \texttt{pyperclip.copy(\_text); pyautogui.hotkey('ctrl', 'v')}. This preserves exact tab and newline characters, and populates the spreadsheet in a single paste with the correct column mapping.}
-    \vspace{-0.1in}
     \label{fig:gpt-14-pastebase64}
 \end{figure}
 
@@ -312,9 +304,7 @@ Step count in the denominator above counts environment steps. Step counts is the
 \begin{figure}
     \centering
     \includegraphics[width=0.95\linewidth]{figures/scatter_steps_vs_perfect_score.pdf}
-    \vspace{-0.15in}
     \caption{\small A scatter plot of perfect success rate against number of steps taken. The pareto optimality curve for models we tested is also shown.}
-    \vspace{-0.1in}
     \label{fig:success-steps-pareto}
 \end{figure}
 
@@ -329,18 +319,14 @@ Open weight models trail significantly behind frontier models, with the Qwen-3.5
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/success_vs_steps_rubrics.pdf}
-    \vspace{-0.3in}
     \caption{\small Perfect rubric rate as a function of step budget. Each curve shows the mean rubrics score achieved within a given number of interaction steps.}
-    \vspace{-0.1in}
     \label{fig:success-vs-steps}
 \end{figure}
 
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/difficulty_bars.pdf}
-    \vspace{-0.3in}
     \caption{\small Rubric scores (left) and \# of steps taken per task (right) broken down by difficulty.}
-    \vspace{-0.1in}
     \label{fig:difficulty-bars}
 \end{figure}
 
@@ -376,9 +362,7 @@ Qwen3.5-4B & 28.9 & 8.7 & 3.8 & 10.7 \\
 UI-TARS-1.5-7B & 4.4 & 0.0 & 0.0 & 1.0 \\
 \bottomrule
 \end{tabular}
-\vspace{-0.05in}
 \caption{\small Perfect rubrics rate (\%) by difficulty on the Odysseys benchmark.}
-\vspace{-0.1in}
 \label{tab:results-by-difficulty}
 \end{table}
 
@@ -771,7 +755,6 @@ Decide whether the rubric ({rubric_id}) is satisfied. Use the required
 \begin{figure}[h]
     \centering
     \includegraphics[width=\linewidth]{figures/success_vs_steps_200_hard.pdf}
-    \vspace{-0.1in}
     \caption{Perfect rubric rate vs.\ step budget at a 200-step budget. Claude Opus 4.6 is shown on the full 200-task set (120 authored/composed + 80 LLM-generated hard) and continues to improve well past the original 100-step cap (vertical dashed line), climbing from 44.5\% to 76.5\%; 14.5\% of Opus runs still exhaust the 200-step budget, suggesting further headroom. For an apples-to-apples comparison, we also show Opus and Qwen-3.5-9B restricted to the 76-task hard subset for which Qwen has 200-step runs: Opus climbs to 64.5\%, while Qwen flatlines at 1.3\%, indicating that additional test-time compute alone is not enough to close the gap on hard long-horizon tasks.}
     \label{fig:success-vs-steps-200}
 \end{figure}
