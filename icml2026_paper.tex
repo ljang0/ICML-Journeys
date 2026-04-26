@@ -39,6 +39,7 @@
 \usepackage{tabularx}
 \usepackage{xspace}
 \usepackage{placeins}
+\usepackage{float}
 
 % if you use cleveref..
 \usepackage[capitalize,noabbrev]{cleveref}
@@ -277,12 +278,12 @@ Rubrics (Perfect)      & \textbf{0.849} & 0.901  & \textbf{0.970}  & 0.934 & \te
 \label{tab:judge-correlation}
 \end{table*}
 
-\begin{figure*}[t]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/examples/gpt-14-pastebase64.pdf}
     \caption{\small After researching 10 surgeon profiles, GPT-5.4 encoded the entire data table as a base64 string inside the Python action, decoded it at runtime with \texttt{pyperclip.copy(\_text); pyautogui.hotkey('ctrl', 'v')}. This preserves exact tab and newline characters, and populates the spreadsheet in a single paste with the correct column mapping.}
     \label{fig:gpt-14-pastebase64}
-\end{figure*}
+\end{figure}
 
 \paragraph{Rubrics Scores} As discussed in Sect.~\ref{sec:rubrics}, we compute rubric scores based on the specific success criteria of each task. To determine the effectiveness of this metric, we measure the agreement between automated LLM judges and human annotations at three levels of granularity, summarized in Tab.~\ref{tab:judge-correlation}. At the finest level, \textit{rubrics (average)} treats each task--rubric pair as an independent observation and computes agreement across all 1,225 rubric pairs; for the \textit{rubrics (perfect)} metric, a task is scored as passing only if every one of its rubrics are satisfied, yielding a single binary label per task; and at the \textit{trajectory} level, we run the LLM judge from Online-M2W~\citep{xue2025illusion}, which issues a holistic pass/fail judgment based on the agent's action trajectory.
 We collected human annotations of a subset of 120 Opus 4.6 trajectories, where each annotator rated whether each rubric was satisfied during the course of the trajectory (see Appendix~\ref{app:human-agreement-ui} for a visualization of the annotation interface). Then, we compute human agreement of each metric by measuring Cohen's $\kappa$ coefficient, the F1 score, and the accuracy against the collected human labels.
@@ -301,35 +302,32 @@ Step count in the denominator above counts environment steps. Step counts is the
 
 
 \subsection{Results}
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=\linewidth]{figures/scatter_steps_vs_perfect_score.pdf}
-    \caption{\small A scatter plot of perfect success rate against number of steps taken. The pareto optimality curve for models we tested is also shown.}
-    \label{fig:success-steps-pareto}
-\end{figure*}
 
 We run all experiments under the same settings: we limit the number of steps to at most 100 steps\footnote{For 100 steps, Opus 4.6 takes approximately 30 mins and \$2.5 to run per task.}, and we use the max reasoning effort (if any). We use the runner from OSWorld~\citep{xie2024osworld}, and start the models off with a Google Chrome window at the provided starting url for each task (if any). The models have access to the full Google Chrome interface, and are allowed to open tabs, save files, or do anything else supported by the virtual machine.
 We evaluate all models with the proposed rubric-based evaluation (Sec.~\ref{sec:rubrics}). The results are summarized in Tab.~\ref{tab:model-scores}. We observe that the best frontier models trained with computer use capabilities (Opus 4.6, GPT-5.4) achieve the strongest scores, with Opus 4.6 scoring slightly better across most metrics. We observed that GPT-5.4 models generally use fewer steps, which may make them more efficient (see Fig.~\ref{fig:success-steps-pareto}).
 Open weight models trail significantly behind frontier models, with the Qwen-3.5-9B model performing the best amongst the open weights CUAs that we evaluated.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_steps_vs_perfect_score.pdf}
+    \caption{\small A scatter plot of perfect success rate against number of steps taken. The pareto optimality curve for models we tested is also shown.}
+    \label{fig:success-steps-pareto}
+\end{figure}
+
 
 \subsection{Analysis} \label{sec:analysis}
 
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=\linewidth]{figures/success_vs_steps_rubrics.pdf}
-    \caption{\small Perfect rubric rate as a function of step budget. Each curve shows the mean rubrics score achieved within a given number of interaction steps.}
-    \label{fig:success-vs-steps}
-\end{figure*}
+\paragraph{Difficulty levels} As described in Sec.~\ref{sec:task-composition}, we also categorized \odysseys tasks by their difficulty levels, which are roughly correlated with how many steps are required to solve the task, and how many unique website domains it needs to traverse. We summarize the performance of the models on these tasks in Fig.~\ref{fig:difficulty-bars} and Tab.~\ref{tab:results-by-difficulty}.
+We observe that performance substantially degrades on hard tasks, with Opus 4.6 averaging a rubric score average of 53.2 and a perfect rate of 11.0\%, substantially outperforming GPT-5.4 (which achieves a score of 33.8) and a perfect rate of 3.7\%. Opus 4.6 and Sonnet 4.6 models also tend to use more steps across all difficulty levels, particularly on hard tasks.
 
-\begin{figure*}[t]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{figures/difficulty_bars.pdf}
     \caption{\small Rubric scores (left) and \# of steps taken per task (right) broken down by difficulty.}
     \label{fig:difficulty-bars}
-\end{figure*}
+\end{figure}
 
-\begin{table}[t]
+\begin{table}[H]
 \centering
 \small
 \setlength{\tabcolsep}{6pt}
@@ -365,11 +363,14 @@ UI-TARS-1.5-7B & 4.4 & 0.0 & 0.0 & 1.0 \\
 \label{tab:results-by-difficulty}
 \end{table}
 
-
-\paragraph{Difficulty levels} As described in Sec.~\ref{sec:task-composition}, we also categorized \odysseys tasks by their difficulty levels, which are roughly correlated with how many steps are required to solve the task, and how many unique website domains it needs to traverse. We summarize the performance of the models on these tasks in Fig.~\ref{fig:difficulty-bars} and Tab.~\ref{tab:results-by-difficulty}.
-We observe that performance substantially degrades on hard tasks, with Opus 4.6 averaging a rubric score average of 53.2 and a perfect rate of 11.0\%, substantially outperforming GPT-5.4 (which achieves a score of 33.8) and a perfect rate of 3.7\%. Opus 4.6 and Sonnet 4.6 models also tend to use more steps across all difficulty levels, particularly on hard tasks.
-
 \paragraph{Scaling with step budget} Fig.~\ref{fig:success-vs-steps} shows how task completion improves as models are allowed more interaction steps. All models exhibit a broadly sigmoidal scaling curve, as the perfect score rates remain close to zero for the first ${\sim}15$ steps, reflecting the minimum number of interactions needed to complete the simplest \odysseys tasks. Rates then rise steadily through the 20--70 step range as progressively harder tasks are fully solved, before the rate of improvement tapers past ${\sim}80$ steps. The two frontier models, Claude Opus 4.6 and GPT-5.4, reach substantially higher asymptotic perfect score rates and climb more steeply through the mid-range, indicating greater per-step efficiency in addition to a higher capability ceiling. In contrast, GPT-5.4 Mini and Qwen 3.5 (35B-A3B and 9B) exhibit markedly shallower slopes and lower asymptotes, suggesting their shortfall reflects fundamental capability gaps rather than insufficient step budgets. We perform an ablation on increasing the max steps to  200, where we find Claude Opus 4.6 to eventually complete tasks at a much higher clip, but Qwen 3.5 is not able to (See \ref{app:200step-scaling}). This finding is promising for the capability of current web agents, but shows room for improvement in trajectory efficiency.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{figures/success_vs_steps_rubrics.pdf}
+    \caption{\small Perfect rubric rate as a function of step budget. Each curve shows the mean rubrics score achieved within a given number of interaction steps.}
+    \label{fig:success-vs-steps}
+\end{figure}
 
 \paragraph{Unique failure modes per model}
 All frontier models we tested exhibit distinct failure patterns on long-horizon tasks. Opus 4.6 most commonly fails through over-investment in research. It continues to gather information, but does not transition to producing the required deliverable, such as creating the final document, and eventually exhausts the step budget with an empty output artifact. This pattern appears in 6 of its 12 zero-score runs. This results in Opus runs remaining productive but incomplete until termination, hitting the 100-step cap on 39\% of tasks, while its partial-credit runs average 97.4 steps.
@@ -383,7 +384,6 @@ Both GPT-5.4 and Opus 4.6 models exhibit behaviors that were notably sophisticat
 Opus 4.6 exhibits a different set of strengths. When target websites return 403 errors, it sometimes falls back to the Wayback Machine by constructing archived URLs and retrieving cached versions of otherwise inaccessible pages (Fig.~\ref{fig:claude-48_wayback}). This allows it, for example, to recover class schedule information that would not be available through direct browsing alone. Opus also makes substantially heavier use of middle-click to open links in background tabs without losing its place on the current page, using this interaction 131 times across all runs compared to just 7 for GPT-5.4. In addition, it uses \texttt{ctrl+f} not only to locate information, but also to falsify hypotheses about page relevance. After searching for a keyword and observing no matches, it often treats that absence as evidence that the page is unproductive and moves on immediately (Fig.~\ref{fig:claude-29_ctrlf_probe}).
 
 
-\FloatBarrier
 \section{Conclusion}
 
 In this work, we introduced \odysseys, a benchmark for evaluating web agents on realistic long-horizon tasks drawn from real browsing behavior. In contrast to previous web benchmarks that emphasize short, single-site episodes, \odysseys focuses on long multi-site workflows that require sustained planning, navigation, and cross-page reasoning.
