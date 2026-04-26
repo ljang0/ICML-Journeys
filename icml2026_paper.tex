@@ -219,7 +219,7 @@ The benchmark comprises 200 tasks spanning three difficulty levels: easy (45), m
 
 \begin{figure*}[!t]
     \centering
-    \includegraphics[width=\linewidth]{figures/examples/gpt-14-pastebase64.pdf}
+    \includegraphics[width=0.85\linewidth]{figures/examples/gpt-14-pastebase64.pdf}
     \caption{\small After researching 10 surgeon profiles, GPT-5.4 encoded the entire data table as a base64 string inside the Python action, decoded it at runtime with \texttt{pyperclip.copy(\_text); pyautogui.hotkey('ctrl', 'v')}. This preserves exact tab and newline characters, and populates the spreadsheet in a single paste with the correct column mapping.}
     \label{fig:gpt-14-pastebase64}
 \end{figure*}
@@ -300,12 +300,12 @@ where $s_i$ is the averaged rubric score for task~$i$ and $n_i$ is the number of
 
 Step count in the denominator above counts environment steps. Step counts is the number of LLM calls, once for each observation-action loop step within the web agent runner. GPT-5.4 averages 2.03 actions per call (49.1\% of calls return two or more actions, up to 24 in a single turn), whereas Opus 4.6 returns exactly 1 action per call in every task. GPT-5.4 therefore spends roughly half as many model round-trips, which materially reduces wall-clock time per task. Qualitatively, GPT-5.4's batched turns often forecast the next few UI states, such as typing a query and pressing enter, and queue the corresponding actions ahead of a fresh screenshot. Opus's per-call observe/act loop forgoes this shortcut even when the next action is trivial. This gap suggests that training or prompting for multi-action batching is a practical path for efficiency on long-horizon tasks.
 
-\begin{figure}[!b]
+\begin{figure*}[!t]
     \centering
     \includegraphics[width=\linewidth]{figures/scatter_steps_vs_perfect_score.pdf}
     \caption{\small A scatter plot of perfect success rate against number of steps taken. The pareto optimality curve for models we tested is also shown.}
     \label{fig:success-steps-pareto}
-\end{figure}
+\end{figure*}
 
 \subsection{Results}
 
@@ -319,12 +319,12 @@ Open weight models trail significantly behind frontier models, with the Qwen-3.5
 \paragraph{Difficulty levels} As described in Sec.~\ref{sec:task-composition}, we also categorized \odysseys tasks by their difficulty levels, which are roughly correlated with how many steps are required to solve the task, and how many unique website domains it needs to traverse. We summarize the performance of the models on these tasks in Fig.~\ref{fig:difficulty-bars} and Tab.~\ref{tab:results-by-difficulty}.
 We observe that performance substantially degrades on hard tasks, with Opus 4.6 averaging a rubric score average of 53.2 and a perfect rate of 11.0\%, substantially outperforming GPT-5.4 (which achieves a score of 33.8) and a perfect rate of 3.7\%. Opus 4.6 and Sonnet 4.6 models also tend to use more steps across all difficulty levels, particularly on hard tasks.
 
-\begin{figure}[H]
+\begin{figure*}[!t]
     \centering
     \includegraphics[width=\linewidth]{figures/difficulty_bars.pdf}
     \caption{\small Rubric scores (left) and \# of steps taken per task (right) broken down by difficulty.}
     \label{fig:difficulty-bars}
-\end{figure}
+\end{figure*}
 
 \begin{table}[H]
 \centering
@@ -364,12 +364,12 @@ UI-TARS-1.5-7B & 4.4 & 0.0 & 0.0 & 1.0 \\
 
 \paragraph{Scaling with step budget} Fig.~\ref{fig:success-vs-steps} shows how task completion improves as models are allowed more interaction steps. All models exhibit a broadly sigmoidal scaling curve, as the perfect score rates remain close to zero for the first ${\sim}15$ steps, reflecting the minimum number of interactions needed to complete the simplest \odysseys tasks. Rates then rise steadily through the 20--70 step range as progressively harder tasks are fully solved, before the rate of improvement tapers past ${\sim}80$ steps. The two frontier models, Claude Opus 4.6 and GPT-5.4, reach substantially higher asymptotic perfect score rates and climb more steeply through the mid-range, indicating greater per-step efficiency in addition to a higher capability ceiling. In contrast, GPT-5.4 Mini and Qwen 3.5 (35B-A3B and 9B) exhibit markedly shallower slopes and lower asymptotes, suggesting their shortfall reflects fundamental capability gaps rather than insufficient step budgets. We perform an ablation on increasing the max steps to  200, where we find Claude Opus 4.6 to eventually complete tasks at a much higher clip, but Qwen 3.5 is not able to (See \ref{app:200step-scaling}). This finding is promising for the capability of current web agents, but shows room for improvement in trajectory efficiency.
 
-\begin{figure}[H]
+\begin{figure*}[!t]
     \centering
     \includegraphics[width=\linewidth]{figures/success_vs_steps_rubrics.pdf}
     \caption{\small Perfect rubric rate as a function of step budget. Each curve shows the mean rubrics score achieved within a given number of interaction steps.}
     \label{fig:success-vs-steps}
-\end{figure}
+\end{figure*}
 
 \paragraph{Unique failure modes per model}
 All frontier models we tested exhibit distinct failure patterns on long-horizon tasks. Opus 4.6 most commonly fails through over-investment in research. It continues to gather information, but does not transition to producing the required deliverable, such as creating the final document, and eventually exhausts the step budget with an empty output artifact. This pattern appears in 6 of its 12 zero-score runs. This results in Opus runs remaining productive but incomplete until termination, hitting the 100-step cap on 39\% of tasks, while its partial-credit runs average 97.4 steps.
