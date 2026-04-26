@@ -41,6 +41,12 @@
 \usepackage{placeins}
 \usepackage{float}
 
+% Add breathing room between adjacent figures/tables and surrounding text
+\setlength{\floatsep}{14pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{16pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{14pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{16pt plus 2pt minus 2pt}
+
 % if you use cleveref..
 \usepackage[capitalize,noabbrev]{cleveref}
 
@@ -119,7 +125,7 @@ We find that binary pass/fail evaluation is inadequate for long-horizon settings
 We tested several leading frontier models and find that the strongest models achieve a success rate of 44.5\%, which leaves substantial room for future improvements.
 Beyond task success, we argue that efficiency is a first-class concern for long-horizon agents. We introduce a Trajectory Efficiency metric (rubric score per step) and find that even frontier agents achieve only 1.15\%, marking an evident need for agents that can succeed efficiently and not simply eventually.
 \odysseys isolates the critical evaluation of long-horizon proficiency in open-web environments, providing a realistic benchmark to measure progress towards computer-use agents that can potentially productively operate for hours.
-We release our tasks, evaluation scripts, and other results at \url{https://odysseys-website.pages.dev}.
+We will release our tasks, evaluation scripts, and other results.
 \end{abstract}
 
 \section{Introduction}
@@ -132,7 +138,7 @@ To address this, we propose a rubric-centric LLM-as-a-Judge evaluation scheme in
 
 We evaluate the leading frontier and open-weight computer-use agents in \odysseys. The strongest model we tested (Opus 4.6) achieves 44.5\% perfect task success, indicating substantial headroom for progress. Our results and analysis show that current agents struggle with core aspects of long-horizon web navigation. We also observe that several compelling strategies emerge, suggesting that current agents have developed flexible behaviors for operating in open-ended computer environments.
 
-We conduct an analysis of model performance, test-time scaling with more steps, and do a qualitative analysis and identify common failure modes, highlighting key challenges for future work on building robust long-horizon computer-use agents. Our benchmark is publicly released and maintained at \url{https://odysseys-website.pages.dev}.
+We conduct an analysis of model performance, test-time scaling with more steps, and do a qualitative analysis and identify common failure modes, highlighting key challenges for future work on building robust long-horizon computer-use agents. Our benchmark and results will be made publicly available.
 
 \begin{figure*}[t]
     \centering
@@ -316,8 +322,12 @@ Open weight models trail significantly behind frontier models, with the Qwen-3.5
 
 \subsection{Analysis} \label{sec:analysis}
 
-\paragraph{Difficulty levels} As described in Sec.~\ref{sec:task-composition}, we also categorized \odysseys tasks by their difficulty levels, which are roughly correlated with how many steps are required to solve the task, and how many unique website domains it needs to traverse. We summarize the performance of the models on these tasks in Fig.~\ref{fig:difficulty-bars} and Tab.~\ref{tab:results-by-difficulty}.
-We observe that performance substantially degrades on hard tasks, with Opus 4.6 averaging a rubric score average of 53.2 and a perfect rate of 11.0\%, substantially outperforming GPT-5.4 (which achieves a score of 33.8) and a perfect rate of 3.7\%. Opus 4.6 and Sonnet 4.6 models also tend to use more steps across all difficulty levels, particularly on hard tasks.
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/success_vs_steps_rubrics.pdf}
+    \caption{\small Perfect rubric rate as a function of step budget. Each curve shows the mean rubrics score achieved within a given number of interaction steps.}
+    \label{fig:success-vs-steps}
+\end{figure*}
 
 \begin{figure*}[!t]
     \centering
@@ -326,7 +336,7 @@ We observe that performance substantially degrades on hard tasks, with Opus 4.6 
     \label{fig:difficulty-bars}
 \end{figure*}
 
-\begin{table}[H]
+\begin{table}[t]
 \centering
 \small
 \setlength{\tabcolsep}{6pt}
@@ -362,14 +372,10 @@ UI-TARS-1.5-7B & 4.4 & 0.0 & 0.0 & 1.0 \\
 \label{tab:results-by-difficulty}
 \end{table}
 
-\paragraph{Scaling with step budget} Fig.~\ref{fig:success-vs-steps} shows how task completion improves as models are allowed more interaction steps. All models exhibit a broadly sigmoidal scaling curve, as the perfect score rates remain close to zero for the first ${\sim}15$ steps, reflecting the minimum number of interactions needed to complete the simplest \odysseys tasks. Rates then rise steadily through the 20--70 step range as progressively harder tasks are fully solved, before the rate of improvement tapers past ${\sim}80$ steps. The two frontier models, Claude Opus 4.6 and GPT-5.4, reach substantially higher asymptotic perfect score rates and climb more steeply through the mid-range, indicating greater per-step efficiency in addition to a higher capability ceiling. In contrast, GPT-5.4 Mini and Qwen 3.5 (35B-A3B and 9B) exhibit markedly shallower slopes and lower asymptotes, suggesting their shortfall reflects fundamental capability gaps rather than insufficient step budgets. We perform an ablation on increasing the max steps to  200, where we find Claude Opus 4.6 to eventually complete tasks at a much higher clip, but Qwen 3.5 is not able to (See \ref{app:200step-scaling}). This finding is promising for the capability of current web agents, but shows room for improvement in trajectory efficiency.
+\paragraph{Difficulty levels} As described in Sec.~\ref{sec:task-composition}, we also categorized \odysseys tasks by their difficulty levels, which are roughly correlated with how many steps are required to solve the task, and how many unique website domains it needs to traverse. We summarize the performance of the models on these tasks in Fig.~\ref{fig:difficulty-bars} and Tab.~\ref{tab:results-by-difficulty}.
+We observe that performance substantially degrades on hard tasks, with Opus 4.6 averaging a rubric score average of 53.2 and a perfect rate of 11.0\%, substantially outperforming GPT-5.4 (which achieves a score of 33.8) and a perfect rate of 3.7\%. Opus 4.6 and Sonnet 4.6 models also tend to use more steps across all difficulty levels, particularly on hard tasks.
 
-\begin{figure*}[!t]
-    \centering
-    \includegraphics[width=\linewidth]{figures/success_vs_steps_rubrics.pdf}
-    \caption{\small Perfect rubric rate as a function of step budget. Each curve shows the mean rubrics score achieved within a given number of interaction steps.}
-    \label{fig:success-vs-steps}
-\end{figure*}
+\paragraph{Scaling with step budget} Fig.~\ref{fig:success-vs-steps} shows how task completion improves as models are allowed more interaction steps. All models exhibit a broadly sigmoidal scaling curve, as the perfect score rates remain close to zero for the first ${\sim}15$ steps, reflecting the minimum number of interactions needed to complete the simplest \odysseys tasks. Rates then rise steadily through the 20--70 step range as progressively harder tasks are fully solved, before the rate of improvement tapers past ${\sim}80$ steps. The two frontier models, Claude Opus 4.6 and GPT-5.4, reach substantially higher asymptotic perfect score rates and climb more steeply through the mid-range, indicating greater per-step efficiency in addition to a higher capability ceiling. In contrast, GPT-5.4 Mini and Qwen 3.5 (35B-A3B and 9B) exhibit markedly shallower slopes and lower asymptotes, suggesting their shortfall reflects fundamental capability gaps rather than insufficient step budgets. We perform an ablation on increasing the max steps to  200, where we find Claude Opus 4.6 to eventually complete tasks at a much higher clip, but Qwen 3.5 is not able to (See \ref{app:200step-scaling}). This finding is promising for the capability of current web agents, but shows room for improvement in trajectory efficiency.
 
 \paragraph{Unique failure modes per model}
 All frontier models we tested exhibit distinct failure patterns on long-horizon tasks. Opus 4.6 most commonly fails through over-investment in research. It continues to gather information, but does not transition to producing the required deliverable, such as creating the final document, and eventually exhausts the step budget with an empty output artifact. This pattern appears in 6 of its 12 zero-score runs. This results in Opus runs remaining productive but incomplete until termination, hitting the 100-step cap on 39\% of tasks, while its partial-credit runs average 97.4 steps.
@@ -388,7 +394,7 @@ Opus 4.6 exhibits a different set of strengths. When target websites return 403 
 In this work, we introduced \odysseys, a benchmark for evaluating web agents on realistic long-horizon tasks drawn from real browsing behavior. In contrast to previous web benchmarks that emphasize short, single-site episodes, \odysseys focuses on long multi-site workflows that require sustained planning, navigation, and cross-page reasoning.
 We demonstrated that existing trajectory-level evaluation methods were insufficient for long-horizon trajectories, and proposed rubric-based evaluations which decompose long-horizon success into verifiable intermediate outcomes. This yields substantially higher agreement with human judgment.
 Our experiments show that, despite strong recent progress in computer-use agents, long-horizon web interaction is far from solved. Even the best frontier models achieve only about 44.5\% perfect-task success, with performance dropping sharply on harder tasks and plateauing as step budgets increase.
-Our analysis suggests that current limitations reflect deeper challenges in long-context planning, maintaining coherence across sites, and reliably executing extended workflows. Improving computer-use agents on long-horizon tasks, such as through reinforcement learning, inference-time search, or the efficiency-oriented techniques above, is a promising direction for future work. We release \odysseys tasks, rubrics, and analysis publicly at \url{https://odysseys-website.pages.dev}. We believe the combination of realistic task design and fine-grained evaluation in \odysseys will help drive future progress on computer-use agents that are able to operate robustly over extended time horizons.
+Our analysis suggests that current limitations reflect deeper challenges in long-context planning, maintaining coherence across sites, and reliably executing extended workflows. Improving computer-use agents on long-horizon tasks, such as through reinforcement learning, inference-time search, or the efficiency-oriented techniques above, is a promising direction for future work. We will release \odysseys tasks, rubrics, and analysis publicly. We believe the combination of realistic task design and fine-grained evaluation in \odysseys will help drive future progress on computer-use agents that are able to operate robustly over extended time horizons.
 
 
 \section*{Ethics Statement}
