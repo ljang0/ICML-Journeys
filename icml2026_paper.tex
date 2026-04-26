@@ -217,6 +217,13 @@ The benchmark comprises 200 tasks spanning three difficulty levels: easy (45), m
 
 \section{Experiments}
 
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/examples/gpt-14-pastebase64.pdf}
+    \caption{\small After researching 10 surgeon profiles, GPT-5.4 encoded the entire data table as a base64 string inside the Python action, decoded it at runtime with \texttt{pyperclip.copy(\_text); pyautogui.hotkey('ctrl', 'v')}. This preserves exact tab and newline characters, and populates the spreadsheet in a single paste with the correct column mapping.}
+    \label{fig:gpt-14-pastebase64}
+\end{figure*}
+
 We benchmark several frontier API-based models and open weight models on \odysseys. Each model is implemented with their own recommended settings for computer-use, and we launch them in the same virtual Ubuntu environments from OSWorld~\citep{xie2024osworld}. The primary application that the models use is Google Chrome, although some models also occasionally choose to use other applications (such as LibreOffice for generating a report).
 We only benchmarked models that have general computer-use abilities, and do not test models that are only trained for web navigation, as many \odysseys tasks involve subtasks that are infeasible for web navigation only models (e.g., maintaining multiple tabs).
 
@@ -278,13 +285,6 @@ Rubrics (Perfect)      & \textbf{0.849} & 0.901  & \textbf{0.970}  & 0.934 & \te
 \label{tab:judge-correlation}
 \end{table*}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{figures/examples/gpt-14-pastebase64.pdf}
-    \caption{\small After researching 10 surgeon profiles, GPT-5.4 encoded the entire data table as a base64 string inside the Python action, decoded it at runtime with \texttt{pyperclip.copy(\_text); pyautogui.hotkey('ctrl', 'v')}. This preserves exact tab and newline characters, and populates the spreadsheet in a single paste with the correct column mapping.}
-    \label{fig:gpt-14-pastebase64}
-\end{figure}
-
 \paragraph{Rubrics Scores} As discussed in Sect.~\ref{sec:rubrics}, we compute rubric scores based on the specific success criteria of each task. To determine the effectiveness of this metric, we measure the agreement between automated LLM judges and human annotations at three levels of granularity, summarized in Tab.~\ref{tab:judge-correlation}. At the finest level, \textit{rubrics (average)} treats each task--rubric pair as an independent observation and computes agreement across all 1,225 rubric pairs; for the \textit{rubrics (perfect)} metric, a task is scored as passing only if every one of its rubrics are satisfied, yielding a single binary label per task; and at the \textit{trajectory} level, we run the LLM judge from Online-M2W~\citep{xue2025illusion}, which issues a holistic pass/fail judgment based on the agent's action trajectory.
 We collected human annotations of a subset of 120 Opus 4.6 trajectories, where each annotator rated whether each rubric was satisfied during the course of the trajectory (see Appendix~\ref{app:human-agreement-ui} for a visualization of the annotation interface). Then, we compute human agreement of each metric by measuring Cohen's $\kappa$ coefficient, the F1 score, and the accuracy against the collected human labels.
 Across all metrics, the rubric-based evaluations substantially outperform the trajectory judge: rubric-average agreement achieves a Cohen's $\kappa$ of 0.788 and F1 of 0.949, compared to 0.508 and 0.762 for the trajectory judge. The task-level \emph{perfect} metric shows even higher agreement ($\kappa = 0.849$) but slightly lower $F1 = 0.934$.
@@ -300,19 +300,18 @@ where $s_i$ is the averaged rubric score for task~$i$ and $n_i$ is the number of
 
 Step count in the denominator above counts environment steps. Step counts is the number of LLM calls, once for each observation-action loop step within the web agent runner. GPT-5.4 averages 2.03 actions per call (49.1\% of calls return two or more actions, up to 24 in a single turn), whereas Opus 4.6 returns exactly 1 action per call in every task. GPT-5.4 therefore spends roughly half as many model round-trips, which materially reduces wall-clock time per task. Qualitatively, GPT-5.4's batched turns often forecast the next few UI states, such as typing a query and pressing enter, and queue the corresponding actions ahead of a fresh screenshot. Opus's per-call observe/act loop forgoes this shortcut even when the next action is trivial. This gap suggests that training or prompting for multi-action batching is a practical path for efficiency on long-horizon tasks.
 
+\begin{figure}[!b]
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_steps_vs_perfect_score.pdf}
+    \caption{\small A scatter plot of perfect success rate against number of steps taken. The pareto optimality curve for models we tested is also shown.}
+    \label{fig:success-steps-pareto}
+\end{figure}
 
 \subsection{Results}
 
 We run all experiments under the same settings: we limit the number of steps to at most 100 steps\footnote{For 100 steps, Opus 4.6 takes approximately 30 mins and \$2.5 to run per task.}, and we use the max reasoning effort (if any). We use the runner from OSWorld~\citep{xie2024osworld}, and start the models off with a Google Chrome window at the provided starting url for each task (if any). The models have access to the full Google Chrome interface, and are allowed to open tabs, save files, or do anything else supported by the virtual machine.
 We evaluate all models with the proposed rubric-based evaluation (Sec.~\ref{sec:rubrics}). The results are summarized in Tab.~\ref{tab:model-scores}. We observe that the best frontier models trained with computer use capabilities (Opus 4.6, GPT-5.4) achieve the strongest scores, with Opus 4.6 scoring slightly better across most metrics. We observed that GPT-5.4 models generally use fewer steps, which may make them more efficient (see Fig.~\ref{fig:success-steps-pareto}).
 Open weight models trail significantly behind frontier models, with the Qwen-3.5-9B model performing the best amongst the open weights CUAs that we evaluated.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{figures/scatter_steps_vs_perfect_score.pdf}
-    \caption{\small A scatter plot of perfect success rate against number of steps taken. The pareto optimality curve for models we tested is also shown.}
-    \label{fig:success-steps-pareto}
-\end{figure}
 
 
 \subsection{Analysis} \label{sec:analysis}
